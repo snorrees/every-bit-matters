@@ -1,23 +1,22 @@
-var speedtest = require('speedtest-net'),
-    fileSystem = require('fs'),
-    socket = require('socket.io-client')('http://localhost:3000/'),
-    fileName = __dirname + '/history.json',
-    history = JSON.parse(fileSystem.readFileSync(fileName));
+var speedtest = require('speedtest-net');
+var fileSystem = require('fs');
+var fileName = __dirname + '/history.json';
+var history = JSON.parse(fileSystem.readFileSync(fileName));
+var socket = require('socket.io-client')('http://localhost:3000/');
 
 socket.on('connect', function () {
-    console.log('Speedtester is connected!');
+    console.log('Logger is connected');
 });
 
-socket.on('speedtest:history', function () {
-    socket.emit('speedtest:results', history);
+socket.on('logger:history', function () {
+    socket.emit('server:results', history);
 });
 
-socket.on('speedtest:run', function () {
-
-    var test = speedtest();
-
+socket.on('logger:run', function () {
     console.log('Starting speedtest...');
 
+    var test = speedtest();
+    
     test.on('data', function (data) {
         var result = {
             download: data.speeds.download,
@@ -27,7 +26,7 @@ socket.on('speedtest:run', function () {
         };
 
         history.push(result);
-        socket.emit('speedtest:results', history);
+        socket.emit('server:results', history);
 
         var jsonResult = JSON.stringify(history);
         fileSystem.writeFile(fileName, jsonResult, function (err) {
