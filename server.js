@@ -6,16 +6,17 @@ var port = process.env.PORT || 3000;
 
 io.on('connect', function (socket) {
     console.log('Looksies! We got ourselves a user!');
+    io.emit('logger:history');
 
-    socket.on('speedtest:results', function (data) {
-        console.log("speedtest:results");
-        io.emit('speedtest:display', data);
+    socket.on('server:results', function (data) {
+        console.log("server:results");
+        io.emit('client:display', data);
     });
 });
 
 setInterval(function () {
-    io.emit('speedtest:run');
-}, 30000);
+    io.emit('logger:run');
+}, 60000);
 
 app.use('/', express.static('client'));
 

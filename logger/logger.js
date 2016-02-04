@@ -9,7 +9,11 @@ socket.on('connect', function () {
     console.log('Logger is connected');
 });
 
-socket.on('speedtest:run', function () {
+socket.on('logger:history', function () {
+    socket.emit('server:results', history);
+});
+
+socket.on('logger:run', function () {
     console.log('Starting speedtest...');
 
     test.on('data', function (data) {
@@ -21,6 +25,7 @@ socket.on('speedtest:run', function () {
         };
 
         history.push(result);
+        socket.emit('server:results', history);
 
         var jsonResult = JSON.stringify(history);
         fileSystem.writeFile(fileName, jsonResult, function (err) {
